@@ -28,8 +28,8 @@ import (
 	"golang.org/x/xerrors"
 	"gopkg.in/cheggaaa/pb.v1"
 
-	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/filecoin-project/go-paramfetch"
+	"github.com/jafri/go-jsonrpc"
 
 	lapi "github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/build"

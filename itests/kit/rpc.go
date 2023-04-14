@@ -13,7 +13,7 @@ import (
 	manet "github.com/multiformats/go-multiaddr/net"
 	"github.com/stretchr/testify/require"
 
-	"github.com/filecoin-project/go-jsonrpc"
+	"github.com/jafri/go-jsonrpc"
 
 	"github.com/filecoin-project/lotus/api/client"
 	"github.com/filecoin-project/lotus/cmd/lotus-worker/sealworker"

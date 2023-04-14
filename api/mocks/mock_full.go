@@ -23,7 +23,7 @@ import (
 	bitfield "github.com/filecoin-project/go-bitfield"
 	datatransfer "github.com/filecoin-project/go-data-transfer/v2"
 	retrievalmarket "github.com/filecoin-project/go-fil-markets/retrievalmarket"
-	jsonrpc "github.com/filecoin-project/go-jsonrpc"
+	jsonrpc "github.com/jafri/go-jsonrpc"
 	auth "github.com/filecoin-project/go-jsonrpc/auth"
 	abi "github.com/filecoin-project/go-state-types/abi"
 	big "github.com/filecoin-project/go-state-types/big"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/filecoin-project/go-jsonrpc"
+	"github.com/jafri/go-jsonrpc"
 )
 
 const (

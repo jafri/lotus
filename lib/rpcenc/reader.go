@@ -18,8 +18,8 @@ import (
 	logging "github.com/ipfs/go-log/v2"
 	"golang.org/x/xerrors"
 
-	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/filecoin-project/go-state-types/abi"
+	"github.com/jafri/go-jsonrpc"
 
 	"github.com/filecoin-project/lotus/lib/httpreader"
 	"github.com/filecoin-project/lotus/storage/pipeline/lib/nullreader"

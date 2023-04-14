@@ -19,8 +19,8 @@ import (
 	"github.com/xeipuuv/gojsonschema"
 
 	"github.com/filecoin-project/go-address"
-	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/filecoin-project/go-state-types/big"
+	"github.com/jafri/go-jsonrpc"
 
 	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/types"

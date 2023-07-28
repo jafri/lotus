@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/filecoin-project/go-jsonrpc/auth"
+	"github.com/jafri/go-jsonrpc/auth"
 )
 
 const (

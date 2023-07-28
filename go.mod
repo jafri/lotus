@@ -42,7 +42,6 @@ require (
 	github.com/filecoin-project/go-fil-commcid v0.1.0
 	github.com/filecoin-project/go-fil-commp-hashhash v0.1.0
 	github.com/filecoin-project/go-fil-markets v1.28.3
-	github.com/filecoin-project/go-jsonrpc v0.3.1
 	github.com/filecoin-project/go-padreader v0.0.1
 	github.com/filecoin-project/go-paramfetch v0.0.4
 	github.com/filecoin-project/go-state-types v0.11.1
@@ -101,14 +100,9 @@ require (
 	github.com/ipld/go-codec-dagpb v1.6.0
 	github.com/ipld/go-ipld-prime v0.20.0
 	github.com/ipld/go-ipld-selector-text-lite v0.0.1
-<<<<<<< HEAD
-	github.com/ipni/index-provider v0.11.0
-	github.com/ipni/storetheindex v0.5.10
-	github.com/jafri/go-jsonrpc v0.2.4
-=======
 	github.com/ipni/go-libipni v0.0.8
 	github.com/ipni/index-provider v0.12.0
->>>>>>> 3f93b86ebea667cd94685f84db0dfa54ac5c5ead
+	github.com/jafri/go-jsonrpc v0.2.5
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/koalacxr/quantile v0.0.1
 	github.com/libp2p/go-buffer-pool v0.1.0

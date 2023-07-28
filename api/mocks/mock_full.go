@@ -24,7 +24,7 @@ import (
 	datatransfer "github.com/filecoin-project/go-data-transfer/v2"
 	retrievalmarket "github.com/filecoin-project/go-fil-markets/retrievalmarket"
 	jsonrpc "github.com/jafri/go-jsonrpc"
-	auth "github.com/filecoin-project/go-jsonrpc/auth"
+	auth "github.com/jafri/go-jsonrpc/auth"
 	abi "github.com/filecoin-project/go-state-types/abi"
 	big "github.com/filecoin-project/go-state-types/big"
 	paych "github.com/filecoin-project/go-state-types/builtin/v8/paych"

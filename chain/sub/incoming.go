@@ -8,11 +8,11 @@ import (
 	"time"
 
 	lru "github.com/hashicorp/golang-lru/v2"
-	bserv "github.com/ipfs/go-blockservice"
+	bserv "github.com/ipfs/boxo/blockservice"
+	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
-	blocks "github.com/ipfs/go-libipfs/blocks"
 	logging "github.com/ipfs/go-log/v2"
-	"github.com/ipni/storetheindex/announce/message"
+	"github.com/ipni/go-libipni/announce/message"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/connmgr"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -27,7 +27,6 @@ import (
 	"github.com/filecoin-project/lotus/chain/consensus"
 	"github.com/filecoin-project/lotus/chain/messagepool"
 	"github.com/filecoin-project/lotus/chain/store"
-	"github.com/filecoin-project/lotus/chain/sub/bcast"
 	"github.com/filecoin-project/lotus/chain/sub/ratelimit"
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/metrics"
@@ -44,11 +43,10 @@ var msgCidPrefix = cid.Prefix{
 	MhLength: 32,
 }
 
-func HandleIncomingBlocks(ctx context.Context, bsub *pubsub.Subscription, self peer.ID, s *chain.Syncer, bs bserv.BlockService, cmgr connmgr.ConnManager) {
+func HandleIncomingBlocks(ctx context.Context, bsub *pubsub.Subscription, s *chain.Syncer, bs bserv.BlockService, cmgr connmgr.ConnManager) {
 	// Timeout after (block time + propagation delay). This is useless at
 	// this point.
 	timeout := time.Duration(build.BlockDelaySecs+build.PropagationDelaySecs) * time.Second
-	cb := bcast.NewConsistentBCast(build.CBDeliveryDelay)
 
 	for {
 		msg, err := bsub.Next(ctx)
@@ -68,9 +66,6 @@ func HandleIncomingBlocks(ctx context.Context, bsub *pubsub.Subscription, self p
 		}
 
 		src := msg.GetFrom()
-
-		// Notify consistent broadcast about a new block
-		cb.RcvBlock(ctx, blk)
 
 		go func() {
 			ctx, cancel := context.WithTimeout(ctx, timeout)
@@ -106,20 +101,6 @@ func HandleIncomingBlocks(ctx context.Context, bsub *pubsub.Subscription, self p
 				)
 				log.Warnw("received block with large delay from miner", "block", blk.Cid(), "delay", delay, "miner", blk.Header.Miner)
 			}
-
-			// When we propose a new block ourselves, the proposed block also gets here through SyncSubmitBlock.
-			// If we are the block proposers we don't need to wait for delivery, we know the blocks are
-			// honest.
-			if src != self {
-				log.Debugf("Waiting for consistent broadcast of block in height: %v", blk.Header.Height)
-				if err := cb.WaitForDelivery(blk.Header); err != nil {
-					log.Errorf("not informing syncer about new block, potential equivocation detected (cid: %s, source: %s): %s; ", blk.Header.Cid(), src, err)
-					return
-				}
-			}
-			// Garbage collect the broadcast state
-			cb.GarbageCollect(blk.Header.Height)
-			log.Debugf("Block in height %v delivered successfully (cid=%s)", blk.Header.Height, blk.Cid())
 
 			if s.InformNewBlock(msg.ReceivedFrom, &types.FullBlock{
 				Header:        blk.Header,
@@ -369,6 +350,7 @@ func (mv *MessageValidator) Validate(ctx context.Context, pid peer.ID, msg *pubs
 		)
 		recordFailure(ctx, metrics.MessageValidationFailure, "add")
 		switch {
+
 		case xerrors.Is(err, messagepool.ErrSoftValidationFailure):
 			fallthrough
 		case xerrors.Is(err, messagepool.ErrRBFTooLowPremium):
@@ -377,8 +359,21 @@ func (mv *MessageValidator) Validate(ctx context.Context, pid peer.ID, msg *pubs
 			fallthrough
 		case xerrors.Is(err, messagepool.ErrNonceGap):
 			fallthrough
+		case xerrors.Is(err, messagepool.ErrGasFeeCapTooLow):
+			fallthrough
 		case xerrors.Is(err, messagepool.ErrNonceTooLow):
+			fallthrough
+		case xerrors.Is(err, messagepool.ErrNotEnoughFunds):
+			fallthrough
+		case xerrors.Is(err, messagepool.ErrExistingNonce):
 			return pubsub.ValidationIgnore
+
+		case xerrors.Is(err, messagepool.ErrMessageTooBig):
+			fallthrough
+		case xerrors.Is(err, messagepool.ErrMessageValueTooHigh):
+			fallthrough
+		case xerrors.Is(err, messagepool.ErrInvalidToAddr):
+			fallthrough
 		default:
 			return pubsub.ValidationReject
 		}

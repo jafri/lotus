@@ -3710,7 +3710,9 @@ Response:
 ```json
 {
   "Reachability": 1,
-  "PublicAddr": "string value"
+  "PublicAddrs": [
+    "string value"
+  ]
 }
 ```
 
@@ -4200,7 +4202,7 @@ Inputs:
 Response:
 ```json
 {
-  "Channel": "\u003cempty\u003e",
+  "Channel": "f01234",
   "From": "f01234",
   "To": "f01234",
   "ConfirmedAmt": "0",
@@ -4231,7 +4233,7 @@ Inputs:
 Response:
 ```json
 {
-  "Channel": "\u003cempty\u003e",
+  "Channel": "f01234",
   "From": "f01234",
   "To": "f01234",
   "ConfirmedAmt": "0",
@@ -4727,7 +4729,7 @@ Perms: read
 Inputs:
 ```json
 [
-  18
+  20
 ]
 ```
 
@@ -4742,7 +4744,7 @@ Perms: read
 Inputs:
 ```json
 [
-  18
+  20
 ]
 ```
 
@@ -4951,7 +4953,7 @@ Response:
     },
     "Nonce": 42,
     "Balance": "0",
-    "Address": "\u003cempty\u003e"
+    "Address": "f01234"
   }
 }
 ```
@@ -5240,7 +5242,7 @@ Response:
   },
   "Nonce": 42,
   "Balance": "0",
-  "Address": "\u003cempty\u003e"
+  "Address": "f01234"
 }
 ```
 
@@ -5428,7 +5430,6 @@ Response:
     "UpgradeRefuelHeight": 10101,
     "UpgradeTapeHeight": 10101,
     "UpgradeKumquatHeight": 10101,
-    "UpgradePriceListOopsHeight": 10101,
     "BreezeGasTampingDuration": 10101,
     "UpgradeCalicoHeight": 10101,
     "UpgradePersianHeight": 10101,
@@ -5442,7 +5443,9 @@ Response:
     "UpgradeOhSnapHeight": 10101,
     "UpgradeSkyrHeight": 10101,
     "UpgradeSharkHeight": 10101,
-    "UpgradeHyggeHeight": 10101
+    "UpgradeHyggeHeight": 10101,
+    "UpgradeLightningHeight": 10101,
+    "UpgradeThunderHeight": 10101
   }
 }
 ```
@@ -5982,6 +5985,7 @@ Response:
   "SectorSize": 34359738368,
   "WindowPoStPartitionSectors": 42,
   "ConsensusFaultElapsed": 10101,
+  "PendingOwnerAddress": "f01234",
   "Beneficiary": "f01234",
   "BeneficiaryTerm": {
     "Quota": "0",
@@ -6366,7 +6370,7 @@ Inputs:
 ]
 ```
 
-Response: `18`
+Response: `20`
 
 ### StateReadState
 StateReadState returns the indicated actor's state.

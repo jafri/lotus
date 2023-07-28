@@ -180,6 +180,7 @@ func (m *StateModule) StateMinerInfo(ctx context.Context, actor address.Address,
 		SectorSize:                 info.SectorSize,
 		WindowPoStPartitionSectors: info.WindowPoStPartitionSectors,
 		ConsensusFaultElapsed:      info.ConsensusFaultElapsed,
+		PendingOwnerAddress:        info.PendingOwnerAddress,
 		Beneficiary:                info.Beneficiary,
 		BeneficiaryTerm:            &info.BeneficiaryTerm,
 		PendingBeneficiaryTerm:     info.PendingBeneficiaryTerm,
@@ -1808,6 +1809,8 @@ func (a *StateAPI) StateGetNetworkParams(ctx context.Context) (*api.NetworkParam
 			UpgradeSkyrHeight:        build.UpgradeSkyrHeight,
 			UpgradeSharkHeight:       build.UpgradeSharkHeight,
 			UpgradeHyggeHeight:       build.UpgradeHyggeHeight,
+			UpgradeLightningHeight:   build.UpgradeLightningHeight,
+			UpgradeThunderHeight:     build.UpgradeThunderHeight,
 		},
 	}, nil
 }

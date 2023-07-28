@@ -63,7 +63,7 @@ commands:
                 name: Install Rust
                 command: |
                   curl https://sh.rustup.rs -sSf | sh -s -- -y
-      - run: make deps lotus
+      - run: make deps
   download-params:
     steps:
       - restore_cache:
@@ -304,9 +304,7 @@ jobs:
           darwin: true
           darwin-architecture: arm64
       - run: |
-          export CPATH=$(brew --prefix)/include
-          export LIBRARY_PATH=$(brew --prefix)/lib
-          make lotus lotus-miner lotus-worker
+          export CPATH=$(brew --prefix)/include && export LIBRARY_PATH=$(brew --prefix)/lib && make lotus lotus-miner lotus-worker
       - run: otool -hv lotus
       - run:
           name: check tag and version output match
@@ -795,17 +793,11 @@ workflows:
           suite: itest-mempool
           target: "./itests/mempool_test.go"
       - test:
-          name: test-itest-migration_nv17
+          name: test-itest-migration
           requires:
             - build
-          suite: itest-migration_nv17
-          target: "./itests/migration_nv17_test.go"
-      - test:
-          name: test-itest-migration_nv18
-          requires:
-            - build
-          suite: itest-migration_nv18
-          target: "./itests/migration_nv18_test.go"
+          suite: itest-migration
+          target: "./itests/migration_test.go"
       - test:
           name: test-itest-mpool_msg_uuid
           requires:
@@ -890,6 +882,12 @@ workflows:
             - build
           suite: itest-sdr_upgrade
           target: "./itests/sdr_upgrade_test.go"
+      - test:
+          name: test-itest-sealing_resources
+          requires:
+            - build
+          suite: itest-sealing_resources
+          target: "./itests/sealing_resources_test.go"
       - test:
           name: test-itest-sector_finalize_early
           requires:
@@ -1004,6 +1002,8 @@ workflows:
             - build
           suite: itest-wdpost
           target: "./itests/wdpost_test.go"
+          get-params: true
+          
       - test:
           name: test-itest-wdpost_worker_config
           requires:
@@ -1073,6 +1073,7 @@ workflows:
             branches:
               only:
                 - /^release\/v\d+\.\d+\.\d+(-rc\d+)?$/
+                - /^ci\/.*$/
             tags:
               only:
                 - /^v\d+\.\d+\.\d+(-rc\d+)?$/
@@ -1082,6 +1083,7 @@ workflows:
             branches:
               only:
                 - /^release\/v\d+\.\d+\.\d+(-rc\d+)?$/
+                - /^ci\/.*$/
             tags:
               only:
                 - /^v\d+\.\d+\.\d+(-rc\d+)?$/
@@ -1091,6 +1093,7 @@ workflows:
             branches:
               only:
                 - /^release\/v\d+\.\d+\.\d+(-rc\d+)?$/
+                - /^ci\/.*$/
             tags:
               only:
                 - /^v\d+\.\d+\.\d+(-rc\d+)?$/
@@ -1103,7 +1106,7 @@ workflows:
           filters:
             branches:
               ignore:
-                - /.*/
+                - /^.*$/
             tags:
               only:
                 - /^v\d+\.\d+\.\d+(-rc\d+)?$/
@@ -1118,6 +1121,7 @@ workflows:
             branches:
               only:
                 - /^release\/v\d+\.\d+\.\d+(-rc\d+)?$/
+                - /^ci\/.*$/
       - build-docker:
           name: "Docker push (lotus-all-in-one / stable / mainnet)"
           image: lotus-all-in-one

@@ -4,8 +4,6 @@
 package build
 
 import (
-	"time"
-
 	"github.com/ipfs/go-cid"
 
 	"github.com/filecoin-project/go-address"
@@ -21,7 +19,7 @@ var DrandSchedule = map[abi.ChainEpoch]DrandEnum{
 	0: DrandMainnet,
 }
 
-const GenesisNetworkVersion = network.Version17
+const GenesisNetworkVersion = network.Version18
 
 var NetworkBundle = "butterflynet"
 var BundleOverrides map[actorstypes.Version]string
@@ -52,8 +50,12 @@ const UpgradeHyperdriveHeight = -16
 const UpgradeChocolateHeight = -17
 const UpgradeOhSnapHeight = -18
 const UpgradeSkyrHeight = -19
-const UpgradeSharkHeight = abi.ChainEpoch(-20)
-const UpgradeHyggeHeight = abi.ChainEpoch(600)
+const UpgradeSharkHeight = -20
+const UpgradeHyggeHeight = -21
+
+const UpgradeLightningHeight = 50
+
+const UpgradeThunderHeight = UpgradeLightningHeight + 360
 
 var SupportedProofTypes = []abi.RegisteredSealProof{
 	abi.RegisteredSealProof_StackedDrg512MiBV1,
@@ -89,8 +91,3 @@ const BootstrapPeerThreshold = 2
 const Eip155ChainId = 3141592
 
 var WhitelistedBlock = cid.Undef
-
-// CBDeliveryDelay is the delay before deliver in the synchronous consistent broadcast.
-// This determines the wait time for the detection of potential equivocations.
-// It is a variable instead of a constant so it can be conveniently configured in tests
-var CBDeliveryDelay = 2 * time.Second

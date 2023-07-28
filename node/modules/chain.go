@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/ipfs/go-blockservice"
-	"github.com/ipfs/go-libipfs/bitswap"
-	"github.com/ipfs/go-libipfs/bitswap/network"
+	"github.com/ipfs/boxo/bitswap"
+	"github.com/ipfs/boxo/bitswap/network"
+	"github.com/ipfs/boxo/blockservice"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/routing"
 	"go.uber.org/fx"
@@ -70,7 +70,7 @@ func MessagePool(lc fx.Lifecycle, mctx helpers.MetricsCtx, us stmgr.UpgradeSched
 			return mp.Close()
 		},
 	})
-	protector.AddProtector(mp.TryForEachPendingMessage)
+	protector.AddProtector(mp.ForEachPendingMessage)
 	return mp, nil
 }
 

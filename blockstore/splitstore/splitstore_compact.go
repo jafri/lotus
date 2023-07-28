@@ -10,9 +10,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	blocks "github.com/ipfs/go-block-format"
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipfs/go-ipld-format"
-	blocks "github.com/ipfs/go-libipfs/blocks"
 	cbg "github.com/whyrusleeping/cbor-gen"
 	"go.opencensus.io/stats"
 	"golang.org/x/sync/errgroup"
@@ -91,7 +91,35 @@ func (s *SplitStore) HeadChange(_, apply []*types.TipSet) error {
 	//      Regardless, we put a mutex in HeadChange just to be safe
 
 	if !atomic.CompareAndSwapInt32(&s.compacting, 0, 1) {
-		// we are currently compacting -- protect the new tipset(s)
+		// we are currently compacting
+		// 1. Signal sync condition to yield compaction when out of sync and resume when in sync
+		timestamp := time.Unix(int64(curTs.MinTimestamp()), 0)
+		if CheckSyncGap && time.Since(timestamp) > SyncGapTime {
+			/* Chain out of sync */
+			if atomic.CompareAndSwapInt32(&s.outOfSync, 0, 1) {
+				// transition from in sync to out of sync
+				s.chainSyncMx.Lock()
+				s.chainSyncFinished = false
+				s.chainSyncMx.Unlock()
+			}
+			// already out of sync, no signaling necessary
+
+		}
+		// TODO: ok to use hysteresis with no transitions between 30s and 1m?
+		if time.Since(timestamp) < SyncWaitTime {
+			/* Chain in sync */
+			if atomic.CompareAndSwapInt32(&s.outOfSync, 0, 0) {
+				// already in sync, no signaling necessary
+			} else {
+				// transition from out of sync to in sync
+				s.chainSyncMx.Lock()
+				s.chainSyncFinished = true
+				s.chainSyncCond.Broadcast()
+				s.chainSyncMx.Unlock()
+			}
+
+		}
+		// 2. protect the new tipset(s)
 		s.protectTipSets(apply)
 		return nil
 	}
@@ -545,7 +573,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 	}
 	defer coldSet.Close() //nolint:errcheck
 
-	if err := s.checkClosing(); err != nil {
+	if err := s.checkYield(); err != nil {
 		return err
 	}
 
@@ -617,7 +645,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 
 	log.Infow("marking done", "took", time.Since(startMark), "marked", *count)
 
-	if err := s.checkClosing(); err != nil {
+	if err := s.checkYield(); err != nil {
 		return err
 	}
 
@@ -627,7 +655,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 		return xerrors.Errorf("error protecting transactional refs: %w", err)
 	}
 
-	if err := s.checkClosing(); err != nil {
+	if err := s.checkYield(); err != nil {
 		return err
 	}
 
@@ -704,7 +732,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 	stats.Record(s.ctx, metrics.SplitstoreCompactionHot.M(hotCnt))
 	stats.Record(s.ctx, metrics.SplitstoreCompactionCold.M(coldCnt))
 
-	if err := s.checkClosing(); err != nil {
+	if err := s.checkYield(); err != nil {
 		return err
 	}
 
@@ -713,7 +741,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 	// possibly delete objects we didn't have when we were collecting cold objects)
 	s.waitForMissingRefs(markSet)
 
-	if err := s.checkClosing(); err != nil {
+	if err := s.checkYield(); err != nil {
 		return err
 	}
 
@@ -733,7 +761,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 		}
 		log.Infow("moving done", "took", time.Since(startMove))
 
-		if err := s.checkClosing(); err != nil {
+		if err := s.checkYield(); err != nil {
 			return err
 		}
 
@@ -764,7 +792,7 @@ func (s *SplitStore) doCompact(curTs *types.TipSet) error {
 	}
 
 	// wait for the head to catch up so that the current tipset is marked
-	s.waitForSync()
+	s.waitForTxnSync()
 
 	if err := s.checkClosing(); err != nil {
 		return err
@@ -865,7 +893,7 @@ func (s *SplitStore) beginCriticalSection(markSet MarkSet) error {
 	return nil
 }
 
-func (s *SplitStore) waitForSync() {
+func (s *SplitStore) waitForTxnSync() {
 	log.Info("waiting for sync")
 	if !CheckSyncGap {
 		log.Warnf("If you see this outside of test it is a serious splitstore issue")
@@ -882,6 +910,25 @@ func (s *SplitStore) waitForSync() {
 	for !s.txnSync {
 		s.txnSyncCond.Wait()
 	}
+}
+
+// Block compaction operations if chain sync has fallen behind
+func (s *SplitStore) waitForSync() {
+	if atomic.LoadInt32(&s.outOfSync) == 0 {
+		return
+	}
+	s.chainSyncMx.Lock()
+	defer s.chainSyncMx.Unlock()
+
+	for !s.chainSyncFinished {
+		s.chainSyncCond.Wait()
+	}
+}
+
+// Combined sync and closing check
+func (s *SplitStore) checkYield() error {
+	s.waitForSync()
+	return s.checkClosing()
 }
 
 func (s *SplitStore) endTxnProtect() {
@@ -1037,7 +1084,7 @@ func (s *SplitStore) walkChain(ts *types.TipSet, inclState, inclMsgs abi.ChainEp
 
 	for len(toWalk) > 0 {
 		// walking can take a while, so check this with every opportunity
-		if err := s.checkClosing(); err != nil {
+		if err := s.checkYield(); err != nil {
 			return err
 		}
 
@@ -1067,13 +1114,17 @@ func (s *SplitStore) walkChain(ts *types.TipSet, inclState, inclMsgs abi.ChainEp
 					if err := walkBlock(c); err != nil {
 						return xerrors.Errorf("error walking block (cid: %s): %w", c, err)
 					}
+
+					if err := s.checkYield(); err != nil {
+						return xerrors.Errorf("check yield: %w", err)
+					}
 				}
 				return nil
 			})
 		}
 
 		if err := g.Wait(); err != nil {
-			return err
+			return xerrors.Errorf("walkBlock workers errored: %w", err)
 		}
 	}
 
@@ -1107,7 +1158,7 @@ func (s *SplitStore) walkObject(c cid.Cid, visitor ObjectVisitor, f func(cid.Cid
 
 	// check this before recursing
 	if err := s.checkClosing(); err != nil {
-		return 0, err
+		return 0, xerrors.Errorf("check closing: %w", err)
 	}
 
 	var links []cid.Cid
@@ -1176,7 +1227,7 @@ func (s *SplitStore) walkObjectIncomplete(c cid.Cid, visitor ObjectVisitor, f, m
 
 	// check this before recursing
 	if err := s.checkClosing(); err != nil {
-		return sz, err
+		return sz, xerrors.Errorf("check closing: %w", err)
 	}
 
 	var links []cid.Cid
@@ -1262,7 +1313,7 @@ func (s *SplitStore) moveColdBlocks(coldr *ColdSetReader) error {
 	batch := make([]blocks.Block, 0, batchSize)
 
 	err := coldr.ForEach(func(c cid.Cid) error {
-		if err := s.checkClosing(); err != nil {
+		if err := s.checkYield(); err != nil {
 			return err
 		}
 		blk, err := s.hot.Get(s.ctx, c)

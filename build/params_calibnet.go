@@ -6,7 +6,6 @@ package build
 import (
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/ipfs/go-cid"
 
@@ -74,6 +73,12 @@ const UpgradeSharkHeight = 16800 // 6 days after genesis
 // 2023-02-21T16:30:00Z
 const UpgradeHyggeHeight = 322354
 
+// 2023-04-20T14:00:00Z
+const UpgradeLightningHeight = 489094
+
+// 2023-04-21T16:00:00Z
+const UpgradeThunderHeight = UpgradeLightningHeight + 3120
+
 var SupportedProofTypes = []abi.RegisteredSealProof{
 	abi.RegisteredSealProof_StackedDrg32GiBV1,
 	abi.RegisteredSealProof_StackedDrg64GiBV1,
@@ -123,8 +128,3 @@ const BootstrapPeerThreshold = 4
 const Eip155ChainId = 314159
 
 var WhitelistedBlock = cid.Undef
-
-// CBDeliveryDelay is the delay before deliver in the synchronous consistent broadcast.
-// This determines the wait time for the detection of potential equivocations.
-// It is a variable instead of a constant so it can be conveniently configured in tests
-var CBDeliveryDelay = 2 * time.Second

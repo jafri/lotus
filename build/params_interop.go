@@ -6,7 +6,6 @@ package build
 import (
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/ipfs/go-cid"
 
@@ -50,10 +49,11 @@ var UpgradeHyperdriveHeight = abi.ChainEpoch(-16)
 var UpgradeChocolateHeight = abi.ChainEpoch(-17)
 var UpgradeOhSnapHeight = abi.ChainEpoch(-18)
 var UpgradeSkyrHeight = abi.ChainEpoch(-19)
+var UpgradeSharkHeight = abi.ChainEpoch(-20)
+var UpgradeHyggeHeight = abi.ChainEpoch(-21)
+var UpgradeLightningHeight = abi.ChainEpoch(-22)
 
-const UpgradeSharkHeight = abi.ChainEpoch(-20)
-
-const UpgradeHyggeHeight = abi.ChainEpoch(99999999999999)
+const UpgradeThunderHeight = 50
 
 var DrandSchedule = map[abi.ChainEpoch]DrandEnum{
 	0: DrandMainnet,
@@ -129,8 +129,3 @@ const BootstrapPeerThreshold = 2
 const Eip155ChainId = 3141592
 
 var WhitelistedBlock = cid.Undef
-
-// CBDeliveryDelay is the delay before deliver in the synchronous consistent broadcast.
-// This determines the wait time for the detection of potential equivocations.
-// It is a variable instead of a constant so it can be conveniently configured in tests
-var CBDeliveryDelay = 2 * time.Second

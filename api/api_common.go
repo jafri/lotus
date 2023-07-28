@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/filecoin-project/go-jsonrpc/auth"
+	"github.com/jafri/go-jsonrpc/auth"
 
 	apitypes "github.com/filecoin-project/lotus/api/types"
 	"github.com/filecoin-project/lotus/journal/alerting"

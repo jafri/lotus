@@ -512,7 +512,7 @@ The `lotus-miner sector list` is now running in parallel - which should speed up
 ## Dependencies
 - github.com/filecoin-project/go-dagaggregator-unixfs (v0.2.0 -> v0.3.0):
 - github.com/filecoin-project/go-fil-markets (v1.25.2 -> v1.27.0-rc1):
-- github.com/filecoin-project/go-jsonrpc (v0.2.1 -> v0.2.3):
+- github.com/jafri/go-jsonrpc (v0.2.1 -> v0.2.3):
 - github.com/filecoin-project/go-statemachine (v1.0.2 -> v1.0.3):
 - github.com/filecoin-project/go-state-types (v0.10.0 -> v0.11.0-alpha-3)
 - github.com/ipfs/go-cid (v0.3.2 -> v0.4.0):
@@ -1189,7 +1189,7 @@ The manifest CID & full list of actor code CIDs for nv17 using [actor v9](https:
 - chore: deps: update go-state-types and builtin-actors for v9 release ([filecoin-project/lotus#9485](https://github.com/filecoin-project/lotus/pull/9485))
 - deps: backport: #9455 ([filecoin-project/lotus#9463](https://github.com/filecoin-project/lotus/pull/9463))
 - Deps: Update go-fil-markets to 1.24.0-v17 ([filecoin-project/lotus#9450](https://github.com/filecoin-project/lotus/pull/9450))
-- github.com/filecoin-project/go-jsonrpc (v0.1.7 -> v0.1.8)
+- github.com/jafri/go-jsonrpc (v0.1.7 -> v0.1.8)
 - github.com/filecoin-project/go-state-types (v0.1.12-beta -> v0.9.0):
 
 ## Others
@@ -1308,7 +1308,7 @@ In v1.17.2 the default PropagationDelay has been raised from 6 seconds -> 10 sec
 
 ## Dependency updates
 - github.com/filecoin-project/go-fil-markets (v1.23.1 -> v1.24.0)
-- github.com/filecoin-project/go-jsonrpc (v0.1.5 -> v0.1.7)
+- github.com/jafri/go-jsonrpc (v0.1.5 -> v0.1.7)
 - github.com/filecoin-project/go-state-types (v0.1.10 -> v0.1.12-beta)
 - github.com/filecoin-project/go-commp-utils/nonffi (null -> v0.0.0-20220905160352-62059082a837)
 - deps: go-libp2p-pubsub v0.8.0 ([filecoin-project/lotus#9229](https://github.com/filecoin-project/lotus/pull/9229))
@@ -2480,7 +2480,7 @@ This is an optional Lotus v1.13.1 release.
 - Update go-graphsync v0.10.1 ([filecoin-project/lotus#7457](https://github.com/filecoin-project/lotus/pull/7457))
 - update to proof v10.1.0 ([filecoin-project/lotus#7564](https://github.com/filecoin-project/lotus/pull/7564))
 - github.com/filecoin-project/specs-actors/v6 (v6.0.0 -> v6.0.1):
-- github.com/filecoin-project/go-jsonrpc (v0.1.4-0.20210217175800-45ea43ac2bec -> v0.1.5):
+- github.com/jafri/go-jsonrpc (v0.1.4-0.20210217175800-45ea43ac2bec -> v0.1.5):
 - github.com/filecoin-project/go-fil-markets (v1.13.1 -> v1.13.3):
 - github.com/filecoin-project/go-data-transfer (v1.11.1 -> v1.11.4):
 - github.com/filecoin-project/go-crypto (v0.0.0-20191218222705-effae4ea9f03 -> v0.0.1):
@@ -3821,7 +3821,7 @@ Note that this release does NOT set an upgrade epoch for v3 actors to take effec
 - [#5535](https://github.com/filecoin-project/lotus/pull/5535) Updated to [go-fil-markets@v1.1.7](https://github.com/filecoin-project/go-fil-markets/releases/tag/v1.1.7)
 - [#5616](https://github.com/filecoin-project/lotus/pull/5600) Updated to [filecoin-ffi@b6e0b35fb49ed0fe](https://github.com/filecoin-project/filecoin-ffi/releases/tag/b6e0b35fb49ed0fe)
 - [#5599](https://github.com/filecoin-project/lotus/pull/5599) Updated to [go-bitfield@v0.2.4](https://github.com/filecoin-project/go-bitfield/releases/tag/v0.2.4)
-- [#5614](https://github.com/filecoin-project/lotus/pull/5614), , [#5621](https://github.com/filecoin-project/lotus/pull/5621) Updated to [go-jsonrpc@v0.1.3](https://github.com/filecoin-project/go-jsonrpc/releases/tag/v0.1.3)
+- [#5614](https://github.com/filecoin-project/lotus/pull/5614), , [#5621](https://github.com/filecoin-project/lotus/pull/5621) Updated to [go-jsonrpc@v0.1.3](https://github.com/jafri/go-jsonrpc/releases/tag/v0.1.3)
 - [#5459](https://github.com/filecoin-project/lotus/pull/5459) Updated to [spec-actors@v3.0.1](https://github.com/filecoin-project/specs-actors/releases/tag/v3.0.1)
 
 

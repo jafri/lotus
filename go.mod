@@ -112,7 +112,7 @@ require (
 	github.com/ipld/go-ipld-selector-text-lite v0.0.1
 	github.com/ipni/index-provider v0.11.0
 	github.com/ipni/storetheindex v0.5.10
-	github.com/jafri/go-jsonrpc v0.2.7
+	github.com/jafri/go-jsonrpc v0.2.8
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/koalacxr/quantile v0.0.1
 	github.com/libp2p/go-buffer-pool v0.1.0
